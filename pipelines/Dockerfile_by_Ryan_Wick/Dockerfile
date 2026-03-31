@@ -19,7 +19,7 @@ ENV PATH="/opt/conda/envs/autocycler/bin:$PATH"
 RUN curl -L -o autocycler.tar.gz $(curl -s https://api.github.com/repos/rrwick/Autocycler/releases/latest | grep "browser_download_url.*linux-x86_64-musl.*tar.gz" | cut -d '"' -f 4) && \
     tar -xzf autocycler.tar.gz && \
     mv autocycler /opt/conda/envs/autocycler/bin/ && \
-    rm environment.yml autocycler.tar.gz
+    rm autocycler.tar.gz
 
 # Set default command to Autocycler help and show missing/installed tools.
 CMD ["/bin/sh", "-c", "autocycler --help; echo \"\nInstalled tools:\"; cat /tmp/installed_tools.txt; echo \"\nMissing tools:\"; cat /tmp/missing_tools.txt; echo"]
