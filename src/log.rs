@@ -13,10 +13,16 @@
 
 use chrono::prelude::*;
 use colored::Colorize;
+use std::sync::OnceLock;
+
+static LOCAL_OFFSET: OnceLock<FixedOffset> = OnceLock::new();
 
 
 pub fn section_header(text: &str) {
-    let now = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+    let offset = LOCAL_OFFSET.get_or_init(|| {
+        Local::now().offset().fix()
+    });
+    let now = Utc::now().with_timezone(offset).format("%Y-%m-%d %H:%M:%S").to_string();
     let date = format!("({now})");
     eprintln!();
     eprintln!("{} {}", text.bold().bright_yellow().underline(), date.dimmed());
