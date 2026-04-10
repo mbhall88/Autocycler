@@ -44,7 +44,11 @@ pub fn combine(autocycler_dir: PathBuf, in_gfas: Vec<PathBuf>) {
 
     let mut metrics = CombineMetrics::default();
     combine_clusters(&in_gfas, &combined_gfa, &combined_fasta, &mut metrics);
+    eprintln!("Debug: About to save metrics to {}...", combined_yaml.display());
+    let _ = std::io::stderr().flush();
     metrics.save_to_yaml(&combined_yaml);
+    eprintln!("Debug: Metrics saved.");
+    let _ = std::io::stderr().flush();
     finished_message(&combined_gfa, &combined_fasta, &metrics);
 }
 
@@ -91,15 +95,29 @@ fn combine_clusters(in_gfas: &[PathBuf], combined_gfa: &Path, combined_fasta: &P
                     metrics: &mut CombineMetrics) {
     section_header("Combining clusters");
     explanation("This command combines different clusters into a single assembly file.");
+    
+    use std::io::{stderr, Write};
+    eprintln!("Debug: About to create GFA file {}...", combined_gfa.display());
+    let _ = stderr().flush();
     let mut gfa_file = File::create(combined_gfa).unwrap();
+    eprintln!("Debug: GFA file created.");
+    
+    eprintln!("Debug: About to create FASTA file {}...", combined_fasta.display());
+    let _ = stderr().flush();
     let mut fasta_file = File::create(combined_fasta).unwrap();
+    eprintln!("Debug: FASTA file created.");
+    
     writeln!(gfa_file, "H\tVN:Z:1.0").unwrap();
     metrics.consensus_assembly_fully_resolved = true;
     let mut offset = 0;
     for gfa in in_gfas {
-        eprintln!("{}", gfa.display());
+        eprintln!("Debug: Processing cluster GFA {}...", gfa.display());
+        let _ = stderr().flush();
         let (graph, _) = UnitigGraph::from_gfa_file(gfa);
+        eprintln!("Debug: GFA loaded.");
+        let _ = stderr().flush();
         graph.print_basic_graph_info_with_topology();
+        let _ = stderr().flush();
         for unitig in &graph.unitigs {
             let unitig = unitig.borrow();
             let unitig_num = unitig.number + offset;
@@ -134,4 +152,6 @@ fn combine_clusters(in_gfas: &[PathBuf], combined_gfa: &Path, combined_fasta: &P
         metrics.consensus_assembly_clusters.push(cluster_metrics);
         if unitig_count > 1 { metrics.consensus_assembly_fully_resolved = false; }
     }
+    eprintln!("Debug: Loop finished.");
+    let _ = stderr().flush();
 }
