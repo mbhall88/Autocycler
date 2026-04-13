@@ -324,6 +324,10 @@ enum Commands {
 
 
 fn main() {
+    // Force the locale to "C" to avoid hangs in system libraries (like glibc)
+    // when the environment's locale (e.g. en_AU.UTF-8) is missing on the server.
+    std::env::set_var("LC_ALL", "C");
+
     let cli = Cli::parse();
 
     match cli.command {

@@ -14,7 +14,6 @@
 use chrono::prelude::*;
 use colored::Colorize;
 use std::sync::OnceLock;
-use std::io::{stderr, Write};
 
 static LOCAL_OFFSET: OnceLock<FixedOffset> = OnceLock::new();
 
@@ -27,7 +26,6 @@ pub fn section_header(text: &str) {
     let date = format!("({now})");
     eprintln!();
     eprintln!("{} {}", text.bold().bright_yellow().underline(), date.dimmed());
-    let _ = stderr().flush();
 }
 
 
@@ -39,7 +37,6 @@ pub fn explanation(text: &str) {
     let indented_text = format!("    {text}");
     eprintln!("{}", textwrap::fill(&indented_text, term_width).dimmed());
     eprintln!();
-    let _ = stderr().flush();
 }
 
 
